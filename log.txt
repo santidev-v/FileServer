@@ -1,0 +1,11 @@
+2025-10-18T22:49:03.263Z | GET | /
+2025-10-18T22:50:51.165Z | GET | /eliminar
+2025-10-18T22:50:51.275Z | GET | /favicon.ico
+2025-10-18T22:50:59.792Z | GET | /eliminar-archivo
+2025-10-18T22:51:18.176Z | GET | /crear
+2025-10-18T22:52:00.420Z | GET | /escribir-archivo
+2025-10-18T22:52:11.991Z | GET | /eliminar-archivo
+2025-10-18T22:53:57.822Z | GET | /leer-logs
+2025-10-18T22:54:09.816Z | GET | /leer-log
+2025-10-18T22:54:26.057Z | GET | /escribir-archivo
+2025-10-18T22:54:30.477Z | GET | /leer-log

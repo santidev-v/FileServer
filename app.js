@@ -105,9 +105,9 @@ function ensureDatabaseAndTable() {
               }
 
               const samples = [
-                ['Laptop', 1200, 'Equipo 14 pulgadas'],
-                ['Mouse', 15.5, 'Inalambrico'],
-                ['Teclado', 30, 'Mecanico retroiluminado'],
+                ['Laptop', 2500000, 'Equipo 14 pulgadas'],
+                ['Mouse', 200000, 'Inalambrico'],
+                ['Teclado', 250000, 'Mecanico retroiluminado'],
               ];
 
               connection.query(

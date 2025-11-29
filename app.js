@@ -87,9 +87,40 @@ function ensureDatabaseAndTable() {
           )`;
 
           connection.query(createTable, (tableErr) => {
-            connection.end();
-            if (tableErr) return reject(tableErr);
-            resolve();
+            if (tableErr) {
+              connection.end();
+              return reject(tableErr);
+            }
+
+            // Sembrar datos de ejemplo solo si la tabla está vacía
+            connection.query('SELECT COUNT(*) AS total FROM productos', (countErr, rows) => {
+              if (countErr) {
+                connection.end();
+                return reject(countErr);
+              }
+
+              if (rows[0].total > 0) {
+                connection.end();
+                return resolve();
+              }
+
+              const samples = [
+                ['Laptop', 1200, 'Equipo 14 pulgadas'],
+                ['Mouse', 15.5, 'Inalambrico'],
+                ['Teclado', 30, 'Mecanico retroiluminado'],
+              ];
+
+              connection.query(
+                'INSERT INTO productos (nombre, precio, descripcion) VALUES ?',
+                [samples],
+                (seedErr) => {
+                  connection.end();
+                  if (seedErr) return reject(seedErr);
+                  console.log('Datos de ejemplo insertados en productos');
+                  resolve();
+                }
+              );
+            });
           });
         });
       });
@@ -217,20 +248,6 @@ async function handleProductos(req, res, parsedUrl) {
   return reply(req, res, 405, { error: 'Metodo no permitido' }, 'Metodo no permitido');
 }
 
-async function seedSampleData() {
-  const existing = await runQuery('SELECT COUNT(*) AS total FROM productos');
-  if (existing[0].total > 0) return;
-
-  const samples = [
-    ['Laptop', 1200, 'Equipo 14 pulgadas'],
-    ['Mouse', 15.5, 'Inalambrico'],
-    ['Teclado', 30, 'Mecanico retroiluminado'],
-  ];
-
-  await runQuery('INSERT INTO productos (nombre, precio, descripcion) VALUES ?', [samples]);
-  console.log('Datos de ejemplo insertados en productos');
-}
-
 const server = http.createServer(async (req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
 
@@ -255,13 +272,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 ensureDatabaseAndTable()
-  .then(async () => {
+  .then(() => {
     pool = mysql.createPool({ ...DB_BASE_CONFIG, database: DB_NAME, connectionLimit: 10 });
-    try {
-      await seedSampleData();
-    } catch (err) {
-      console.error('No se pudo insertar datos de ejemplo', err);
-    }
     server.listen(PORT, () => {
       console.log(`Servidor escuchando en http://localhost:${PORT}`);
       appendLog(`Servidor iniciado en puerto ${PORT}`);
